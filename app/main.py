@@ -4,6 +4,7 @@ from app.database.mongodb import db
 from app.routes.workout import router as workout_router
 from app.routes.bmi import router as bmi_router
 from app.routes.complaint import router as complaint_router
+from app.routes.admin import router as admin_router
 
 app = FastAPI(
     title="GymPro API",
@@ -32,6 +33,12 @@ app.include_router(
     complaint_router,
     prefix="/complaint",
     tags=["Complaint"]
+)
+
+app.include_router(
+    admin_router,
+    prefix="/admin",
+    tags=["Admin"]
 )
 
 @app.get("/")
