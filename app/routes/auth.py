@@ -9,6 +9,7 @@ from app.utils.security import (
 from app.utils.jwt_handler import create_access_token
 from fastapi import Depends
 from app.utils.auth import verify_token
+from app.models.user import User, UpdateUser
 
 router = APIRouter()
 
@@ -74,10 +75,29 @@ def login(user: LoginUser):
 def profile(user=Depends(verify_token)):
 
     db_user = db.users.find_one(
-        {"email": user["email"]}
+        {"email": user["email"]},
+        {"_id": 0, "password": 0}
+    )
+
+    return db_user
+
+@router.put("/profile")
+def update_profile(
+    user_data: UpdateUser,
+    user=Depends(verify_token)
+):
+
+    update_data = {
+        k: v
+        for k, v in user_data.dict().items()
+        if v is not None
+    }
+
+    db.users.update_one(
+        {"email": user["email"]},
+        {"$set": update_data}
     )
 
     return {
-        "name": db_user["name"],
-        "email": db_user["email"]
+        "message": "Profile updated successfully"
     }
