@@ -7,8 +7,8 @@ load_dotenv()
 MONGO_URI = os.getenv("MONGO_URI")
 DATABASE_NAME = os.getenv("DATABASE_NAME")
 
-print("MONGO_URI =", MONGO_URI)
-print("DATABASE_NAME =", DATABASE_NAME)
+
 
 client = MongoClient(MONGO_URI)
 db = client[DATABASE_NAME]
+print("Connected Database:", db.name)

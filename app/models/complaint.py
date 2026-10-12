@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 
 class Complaint(BaseModel):
+    category: str
     subject: str
-    message: str
+    description: str

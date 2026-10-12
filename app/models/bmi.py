@@ -1,5 +1,7 @@
 from pydantic import BaseModel
 
-class BMIRequest(BaseModel):
-    height: float  # cm
-    weight: float  # kg
+class BMI(BaseModel):
+    height: float
+    weight: float
+    age: int
+    gender: str

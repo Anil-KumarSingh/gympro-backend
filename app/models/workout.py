@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
 class Workout(BaseModel):
-    exercise: str
-    reps: int
+    workout_name: str
     duration: int
+    calories_burned: int

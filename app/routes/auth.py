@@ -11,6 +11,7 @@ from fastapi import Depends
 from app.utils.auth import verify_token
 from app.models.user import User, UpdateUser
 from app.models.complaint import Complaint
+from datetime import datetime
 
 router = APIRouter()
 
@@ -28,18 +29,26 @@ def signup(user: User):
             detail="Email already registered"
         )
 
+    # User data to store in MongoDB
     user_data = {
-        "name": user.name,
-        "email": user.email,
-        "password": hash_password(user.password)
-    }
+    "name": user.name,
+    "email": user.email,
+    "password": hash_password(user.password),
 
+    "role": "user",
+    "status": "Active",
+    "avatar": f"https://i.pravatar.cc/150?u={user.email}",
+
+    "total_workouts": 0,
+    "total_hours": 0,
+    "streak": 0,
+    "last_login": None
+}
     db.users.insert_one(user_data)
 
     return {
         "message": "User registered successfully"
     }
-
 
 @router.post("/login")
 def login(user: LoginUser):
@@ -63,15 +72,28 @@ def login(user: LoginUser):
             detail="Invalid password"
         )
 
+    # Update last login time
+    db.users.update_one(
+        {"email": user.email},
+        {
+            "$set": {
+                "last_login": datetime.utcnow()
+            }
+        }
+    )
+
+    # Create JWT token
     token = create_access_token(
-        {"email": db_user["email"]}
+        {
+            "email": db_user["email"],
+            "role": db_user.get("role", "user")
+        }
     )
 
     return {
         "message": "Login successful",
         "token": token
     }
-
 @router.get("/profile")
 def profile(user=Depends(verify_token)):
 
@@ -80,7 +102,18 @@ def profile(user=Depends(verify_token)):
         {"_id": 0, "password": 0}
     )
 
-    return db_user
+    return {
+    "name": db_user["name"],
+    "email": db_user["email"],
+    "role": db_user.get("role"),
+    "status": db_user.get("status"),
+    "avatar": db_user.get("avatar"),
+
+    "total_workouts": db_user.get("total_workouts", 0),
+    "total_hours": db_user.get("total_hours", 0),
+    "streak": db_user.get("streak", 0),
+    "last_login": db_user.get("last_login")
+}
 
 @router.put("/profile")
 def update_profile(
@@ -102,35 +135,3 @@ def update_profile(
     return {
         "message": "Profile updated successfully"
     }
-
-@router.post("/add")
-def add_complaint(
-    complaint: Complaint,
-    user=Depends(verify_token)
-):
-
-    complaint_data = {
-        "user_email": user["email"],
-        "subject": complaint.subject,
-        "message": complaint.message,
-        "status": "Pending"
-    }
-
-    db.complaints.insert_one(complaint_data)
-
-    return {
-        "message": "Complaint submitted successfully"
-    }
-@router.get("/my")
-def my_complaints(
-    user=Depends(verify_token)
-):
-
-    complaints = list(
-        db.complaints.find(
-            {"user_email": user["email"]},
-            {"_id": 0}
-        )
-    )
-
-    return complaints

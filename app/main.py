@@ -5,10 +5,30 @@ from app.routes.workout import router as workout_router
 from app.routes.bmi import router as bmi_router
 from app.routes.complaint import router as complaint_router
 from app.routes.admin import router as admin_router
+from app.routes.dashboard import router as dashboard_router
+from app.routes.nutrition import router as nutrition_router
+from app.routes.workout import router as workout_router
+from app.routes.bmi import router as bmi_router
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(
     title="GymPro API",
     version="1.0.0"
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://localhost:5500",
+        "http://127.0.0.1:5500",
+        "http://localhost:8000",
+        "http://127.0.0.1:8000",
+    ],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.include_router(
@@ -39,6 +59,29 @@ app.include_router(
     admin_router,
     prefix="/admin",
     tags=["Admin"]
+)
+
+app.include_router(
+    dashboard_router,
+    prefix="/dashboard",
+    tags=["Dashboard"]
+)
+app.include_router(
+    nutrition_router,
+    prefix="/nutrition",
+    tags=["Nutrition"]
+)
+
+app.include_router(
+    workout_router,
+    prefix="/workout",
+    tags=["Workout"]
+)
+
+app.include_router(
+    bmi_router,
+    prefix="/bmi",
+    tags=["BMI"]
 )
 
 @app.get("/")
