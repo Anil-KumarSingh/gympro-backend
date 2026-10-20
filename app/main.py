@@ -19,7 +19,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "https://gympro-frontend-r6bp.onrender.com"
+        "https://gympro-frontend-r6bp.onrender.com",
         ],
     allow_credentials=False,
     allow_methods=["*"],
