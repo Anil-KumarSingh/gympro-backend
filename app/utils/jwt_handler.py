@@ -1,7 +1,8 @@
+import os
 from jose import jwt
 from datetime import datetime, timedelta
 
-SECRET_KEY = "gympro_secret_key"
+SECRET_KEY = os.environ["SECRET_KEY"]
 ALGORITHM = "HS256"
 
 def create_access_token(data: dict):
