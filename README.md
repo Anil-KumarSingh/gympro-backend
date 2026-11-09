@@ -2,6 +2,20 @@
 
 FastAPI and MongoDB backend for GymPro. It provides account authentication, member fitness tracking, support requests, and administrator endpoints.
 
+## Backend layout
+
+```text
+app/
+├── routes/       # FastAPI endpoint handlers
+├── models/       # API/Pydantic request schemas (not ML model files)
+├── services/     # Backend business logic
+├── database/     # MongoDB connection
+├── core/         # Application configuration
+└── utils/        # Auth and security helpers
+```
+
+Exercise pose inference currently runs in the frontend worker. Custom ML training code and trained artifacts belong in the top-level `gympro-ml/` directory, not in `app/models/`.
+
 ## Features
 
 - JWT based member registration, login, and profile management
